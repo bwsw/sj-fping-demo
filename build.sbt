@@ -11,10 +11,10 @@ val commonSettings = Seq(
     "-feature"
   ),
   resolvers +=
-    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+    "Sonatype OSS" at "https://oss.sonatype.org/service/local/staging/deploy/maven2",
 
   libraryDependencies ++= Seq(
-    "com.bwsw" % "sj-engine-core_2.11" % "1.0-SNAPSHOT"),
+    "com.bwsw" % "sj-engine-core_2.11" % "1.0.0"),
 
   assemblyMergeStrategy in assembly := {
     case PathList("scala", xs@_*) => MergeStrategy.first

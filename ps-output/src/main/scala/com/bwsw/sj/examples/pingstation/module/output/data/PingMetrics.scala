@@ -2,7 +2,7 @@ package com.bwsw.sj.examples.pingstation.module.output.data
 
 import java.util.Date
 
-import com.bwsw.sj.engine.core.entities.{OutputData}
+import com.bwsw.sj.engine.core.entities.EsEnvelope
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
   *
   * @author Kseniya Mikhaleva
   */
-class PingMetrics extends OutputData {
+class PingMetrics extends EsEnvelope {
   var ts: Date = null
   var ip: String = null
   @JsonProperty("avg-time") var avgTime: Double= 0

@@ -3,7 +3,7 @@ package com.bwsw.sj.examples.pingstation.module.output
 import java.util.Date
 
 import com.bwsw.common.{JsonSerializer, ObjectSerializer}
-import com.bwsw.sj.engine.core.entities.{EsEnvelope, Envelope, TStreamEnvelope}
+import com.bwsw.sj.engine.core.entities.{Envelope, TStreamEnvelope}
 import com.bwsw.sj.engine.core.output.OutputStreamingExecutor
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics
 
@@ -37,9 +37,7 @@ class Executor extends OutputStreamingExecutor {
 
       println(jsonSerializer.serialize(data)) //todo for testing
 
-      val outputEnvelope = new EsEnvelope
-      outputEnvelope.data = data
-      outputEnvelope
+      data
     }
     list
   }

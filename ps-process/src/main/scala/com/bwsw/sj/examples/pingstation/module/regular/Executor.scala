@@ -2,13 +2,13 @@ package com.bwsw.sj.examples.pingstation.module.regular
 
 import com.bwsw.common.{JsonSerializer, ObjectSerializer}
 import com.bwsw.sj.engine.core.entities._
-import com.bwsw.sj.engine.core.environment.RegularEnvironmentManager
+import com.bwsw.sj.engine.core.environment.ModuleEnvironmentManager
 import com.bwsw.sj.engine.core.regular.RegularStreamingExecutor
 import com.bwsw.sj.engine.core.state.StateStorage
 import com.bwsw.sj.examples.pingstation.module.regular.entities.PingStateVariable
 
 
-class Executor(manager: RegularEnvironmentManager) extends RegularStreamingExecutor(manager) {
+class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecutor(manager) {
 
   val objectSerializer = new ObjectSerializer()
   val jsonSerializer = new JsonSerializer()

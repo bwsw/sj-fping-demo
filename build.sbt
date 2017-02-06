@@ -15,7 +15,7 @@ val commonSettings = Seq(
   resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
   libraryDependencies ++= Seq(
-    "com.bwsw" % "sj-engine-core_2.11" % "1.0-SNAPSHOT"),
+    "com.bwsw" % "sj-engine-core_2.12" % "1.0-SNAPSHOT"),
 
   assemblyMergeStrategy in assembly := {
     case PathList("scala", xs@_*) => MergeStrategy.first

@@ -3,6 +3,6 @@
   "description": "Kafka service for demo",
   "provider": "kafka-ps-provider",
   "type": "KfkQ",
-  "zk-provider": "zookeeper-ps-provider",
-  "zk-namespace": "pingstation"
+  "zkProvider": "zookeeper-ps-provider",
+  "zkNamespace": "pingstation"
 }

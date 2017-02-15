@@ -6,5 +6,5 @@
     "ping",
     "stattion"
   ],
-  "streamType": "elasticsearch-output"
+  "type": "elasticsearch-output"
 }

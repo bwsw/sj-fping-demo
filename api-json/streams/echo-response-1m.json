@@ -10,5 +10,5 @@
   "generator": {
     "generatorType": "local"
   },
-  "streamType": "stream.t-stream"
+  "type": "stream.t-stream"
 }

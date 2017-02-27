@@ -8,7 +8,7 @@ import com.bwsw.sj.engine.core.state.StateStorage
 import com.bwsw.sj.examples.pingstation.module.regular.entities.PingStateVariable
 
 
-class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecutor(manager) {
+class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecutor[String](manager) {
 
   val objectSerializer = new ObjectSerializer()
   val jsonSerializer = new JsonSerializer()
@@ -22,52 +22,41 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     println("on after checkpoint")
   }
 
-  override def onMessage(envelope: Envelope): Unit = {
+  override def onMessage(envelope: TStreamEnvelope[String]): Unit = {
 
-    envelope match {
-      case kafkaEnvelope: KafkaEnvelope =>
-        println("kafka envelope is received. It's something strange")
+    envelope.stream match {
+      case "echo-response" =>
+        val echoResponses = envelope.data.map(jsonSerializer.deserialize[EchoResponse])
 
-      case tstreamEnvelope: TStreamEnvelope =>
+        echoResponses.foreach(x => {
+          println(x) //todo for testing
 
-        val fpingResponses = tstreamEnvelope.data
-          .map(objectSerializer.deserialize)
-          .map(_.asInstanceOf[String])
+          if (!state.isExist(x.ip)) state.set(x.ip, PingStateVariable(0, 0, 0, 0))
 
-        tstreamEnvelope.stream match {
-          case "echo-response" =>
-            val echoResponses = fpingResponses.map(jsonSerializer.deserialize[EchoResponse])
+          val pingStateVariable = state.get(x.ip).asInstanceOf[PingStateVariable]
 
-            echoResponses.foreach(x => {
-              println(x) //todo for testing
+          pingStateVariable.ts = x.ts
+          pingStateVariable.totalTime += x.time
+          pingStateVariable.totalOk += 1
 
-              if (!state.isExist(x.ip)) state.set(x.ip, PingStateVariable(0, 0, 0, 0))
+          state.set(x.ip, pingStateVariable)
+        })
 
-              val pingStateVariable = state.get(x.ip).asInstanceOf[PingStateVariable]
+      case "unreachable-response" =>
+        val unreachableResponses = envelope.data.map(jsonSerializer.deserialize[UnreachableResponse])
 
-              pingStateVariable.ts = x.ts
-              pingStateVariable.totalTime += x.time
-              pingStateVariable.totalOk += 1
+        unreachableResponses.foreach(x => {
+          println(x) //todo for testing
 
-              state.set(x.ip, pingStateVariable)
-            })
+          if (!state.isExist(x.ip)) state.set(x.ip, PingStateVariable(0, 0, 0, 0))
 
-          case "unreachable-response" =>
-            val unreachableResponses = fpingResponses.map(jsonSerializer.deserialize[UnreachableResponse])
+          val pingStateVariable = state.get(x.ip).asInstanceOf[PingStateVariable]
 
-            unreachableResponses.foreach(x => {
-              println(x) //todo for testing
+          pingStateVariable.ts = x.ts
+          pingStateVariable.totalUnreachable += 1
 
-              if (!state.isExist(x.ip)) state.set(x.ip, PingStateVariable(0, 0, 0, 0))
-
-              val pingStateVariable = state.get(x.ip).asInstanceOf[PingStateVariable]
-
-              pingStateVariable.ts = x.ts
-              pingStateVariable.totalUnreachable += 1
-
-              state.set(x.ip, pingStateVariable)
-            })
-        }
+          state.set(x.ip, pingStateVariable)
+        })
     }
   }
 
@@ -88,10 +77,12 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     val pingStateVariables = state.getAll.map(x => (x._1, x._2.asInstanceOf[PingStateVariable]))
     pingStateVariables.map(x =>
       x._2.ts + ","
-      + x._1 + ","
-      + {if (x._2.totalOk != 0 || x._2.totalTime != 0) x._2.totalTime / x._2.totalOk else 0} + ","
-      + x._2.totalOk + ","
-      + x._2.totalUnreachable
+        + x._1 + ","
+        + {
+        if (x._2.totalOk != 0 || x._2.totalTime != 0) x._2.totalTime / x._2.totalOk else 0
+      } + ","
+        + x._2.totalOk + ","
+        + x._2.totalUnreachable
     ).foreach(x => {
       println(x) //todo for testing
       output.put(objectSerializer.serialize(x))
@@ -101,10 +92,10 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
   override def onIdle(): Unit = {}
 
   /**
-   * Handler triggered before persisting a state
-   *
-   * @param isFullState Flag denotes that full state (true) or partial changes of state (false) will be saved
-   */
+    * Handler triggered before persisting a state
+    *
+    * @param isFullState Flag denotes that full state (true) or partial changes of state (false) will be saved
+    */
   override def onBeforeStateSave(isFullState: Boolean): Unit = {
     println("on before state saving")
     state.clear()

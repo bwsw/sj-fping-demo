@@ -1,15 +1,14 @@
 package com.bwsw.sj.examples.pingstation.module.input
 
-import com.bwsw.common.{JsonSerializer, ObjectSerializer}
-import com.bwsw.sj.engine.core.entities.{UnreachableResponse, EchoResponse, InputEnvelope}
+import com.bwsw.common.JsonSerializer
+import com.bwsw.sj.engine.core.entities.{EchoResponse, InputEnvelope, UnreachableResponse}
 import com.bwsw.sj.engine.core.environment.InputEnvironmentManager
 import com.bwsw.sj.engine.core.input.{InputStreamingExecutor, Interval}
 import io.netty.buffer.ByteBuf
 
 
-class Executor(manager: InputEnvironmentManager) extends InputStreamingExecutor(manager) {
+class Executor(manager: InputEnvironmentManager) extends InputStreamingExecutor[String](manager) {
 
-  val objectSerializer = new ObjectSerializer()
   val jsonSerializer = new JsonSerializer()
   val echoResponseStreamName = "echo-response"
   val unreachableResponseStreamName = "unreachable-response"
@@ -32,7 +31,7 @@ class Executor(manager: InputEnvironmentManager) extends InputStreamingExecutor(
    * @param buffer Input stream is a flow of bytes
    * @return Input envelope or None
    */
-  override def parse(buffer: ByteBuf, interval: Interval): Option[InputEnvelope] = {
+  override def parse(buffer: ByteBuf, interval: Interval): Option[InputEnvelope[String]] = {
 
     val ts = System.currentTimeMillis()
     val rawData = buffer.slice(interval.initialValue, interval.finalValue)
@@ -42,13 +41,15 @@ class Executor(manager: InputEnvironmentManager) extends InputStreamingExecutor(
 
     val fpingResponse = new String(data)
 
+    println("raw response: " + fpingResponse + ";") //todo for testing
+
     val parsedResponse = fpingResponse.split("\\s+")
     parsedResponse.head match {
       case "ICMP" =>
 
         val response = new UnreachableResponse(ts, parsedResponse.last)
         println(response + ";") //todo for testing
-        val serializedResponse = objectSerializer.serialize(jsonSerializer.serialize(response))
+        val serializedResponse = jsonSerializer.serialize(response)
 
         Some(new InputEnvelope(
           fpingResponse,
@@ -60,7 +61,7 @@ class Executor(manager: InputEnvironmentManager) extends InputStreamingExecutor(
 
         val response = new EchoResponse(ts, ip, parsedResponse(5).toDouble)
         println(response + ";") //todo for testing
-        val serializedResponse = objectSerializer.serialize(jsonSerializer.serialize(response))
+        val serializedResponse = jsonSerializer.serialize(response)
 
         Some(new InputEnvelope(
           fpingResponse,

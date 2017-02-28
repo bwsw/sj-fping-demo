@@ -108,7 +108,11 @@ and look at field named tasks, e.g. it will look like
 > &nbsp;&nbsp;}   
 > &nbsp;}   
 
-And now you can start a flow:
+You need have 'fping' installed or install it (
+```bash
+sudo apt-get install fping
+```
+). And now you can start a flow:
 ```bash
 fping -l -g 91.221.60.0/23 2>&1 | nc 176.120.25.19 31000
 ```

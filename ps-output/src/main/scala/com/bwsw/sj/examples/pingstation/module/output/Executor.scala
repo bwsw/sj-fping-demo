@@ -6,6 +6,7 @@ import com.bwsw.common.{JsonSerializer, ObjectSerializer}
 import com.bwsw.sj.engine.core.entities.{Envelope, TStreamEnvelope}
 import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.OutputStreamingExecutor
+import com.bwsw.sj.engine.core.output.types.es.{ElasticsearchEntityBuilder, IntegerField, JavaStringField}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics
 
 /**
@@ -41,6 +42,14 @@ class Executor(manager: OutputEnvironmentManager) extends OutputStreamingExecuto
       data
     }
     list
+  }
+  override def getOutputModule = {
+    val entityBuilder = new ElasticsearchEntityBuilder()
+    val entity = entityBuilder
+      .field(new IntegerField("id", 10))
+      .field(new JavaStringField("name", "someString"))
+      .build()
+    entity
   }
 }
 

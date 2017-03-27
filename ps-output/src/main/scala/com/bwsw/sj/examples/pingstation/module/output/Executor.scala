@@ -3,10 +3,10 @@ package com.bwsw.sj.examples.pingstation.module.output
 import java.util.Date
 
 import com.bwsw.common.{JsonSerializer, ObjectSerializer}
-import com.bwsw.sj.engine.core.entities.{Envelope, TStreamEnvelope}
+import com.bwsw.sj.engine.core.entities.{OutputEnvelope, TStreamEnvelope}
 import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.OutputStreamingExecutor
-import com.bwsw.sj.engine.core.output.types.es.{ElasticsearchEntityBuilder, IntegerField, JavaStringField}
+import com.bwsw.sj.engine.core.output.types.es._
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics
 
 /**
@@ -26,7 +26,7 @@ class Executor(manager: OutputEnvironmentManager) extends OutputStreamingExecuto
    * @param envelope Input T-Stream envelope
    * @return List of output envelopes
    */
-  override def onMessage(envelope: TStreamEnvelope[String]): List[Envelope] = {
+  override def onMessage(envelope: TStreamEnvelope[String]): List[OutputEnvelope] = {
     val list = envelope.data.map { s =>
       val data = new PingMetrics()
       val rawData = s.split(",")
@@ -36,18 +36,20 @@ class Executor(manager: OutputEnvironmentManager) extends OutputStreamingExecuto
       data.totalOk = rawData(3).toLong
       data.totalUnreachable = rawData(4).toLong
       data.total = data.totalOk + data.totalUnreachable
-
-      println(jsonSerializer.serialize(data)) //todo for testing
-
       data
     }
     list
   }
-  override def getOutputModule = {
+
+  override def getOutputEntity = {
     val entityBuilder = new ElasticsearchEntityBuilder()
     val entity = entityBuilder
-      .field(new IntegerField("id", 10))
-      .field(new JavaStringField("name", "someString"))
+      .field(new DateField("ts"))
+      .field(new JavaStringField("ip"))
+      .field(new DoubleField("avg-time"))
+      .field(new LongField("total-ok"))
+      .field(new LongField("total-unreachable"))
+      .field(new LongField("total"))
       .build()
     entity
   }

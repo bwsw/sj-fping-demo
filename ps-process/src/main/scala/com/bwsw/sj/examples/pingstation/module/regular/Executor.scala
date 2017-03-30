@@ -1,6 +1,6 @@
 package com.bwsw.sj.examples.pingstation.module.regular
 
-import com.bwsw.common.{JsonSerializer, ObjectSerializer}
+import com.bwsw.common.JsonSerializer
 import com.bwsw.sj.engine.core.entities._
 import com.bwsw.sj.engine.core.environment.ModuleEnvironmentManager
 import com.bwsw.sj.engine.core.regular.RegularStreamingExecutor
@@ -10,7 +10,6 @@ import com.bwsw.sj.examples.pingstation.module.regular.entities.PingStateVariabl
 
 class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecutor[String](manager) {
 
-  val objectSerializer = new ObjectSerializer()
   val jsonSerializer = new JsonSerializer()
   val state: StateStorage = manager.getState
 
@@ -85,7 +84,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
         + x._2.totalUnreachable
     ).foreach(x => {
       println(x) //todo for testing
-      output.put(objectSerializer.serialize(x))
+      output.put(x)
     })
   }
 

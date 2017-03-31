@@ -75,6 +75,11 @@ $ curl --request POST "http://$address/v1/modules/regular-streaming/pingstation-
 $ curl --request POST "http://$address/v1/modules/output-streaming/pingstation-output/1.0/instance" -H 'Content-Type: application/json' --data "@api-json/instances/pingstation-output.json"
 ```
 
+Then create index mapping for pingstation:
+```bash
+$ curl --request PUT "http://176.120.25.19:9200/pingstation/_mapping/es-echo-response-1m" -H 'Content-Type: application/json' --data "@api-json/index_mapping.json"
+```
+
 ## Launching
 
 After that you can launch the every module:

@@ -1,0 +1,10 @@
+{
+  "properties" : {
+    "ts" : { "type" : "date" },
+    "ip" : { "type" : "string" },
+    "avg-time" : { "type" : "double" },
+    "total-ok" : { "type" : "long" },
+    "total-unreachable" : { "type" : "long" },
+    "total" : { "type" : "long" }
+  }
+}

@@ -1,18 +1,12 @@
 {
   "name" : "pingstation-input",
-  "description" : "Input engine for ping station example",
-  "outputs" : ["echo-response", "unreachable-response"],
+  "description" : "Input engine settings for ping station example",
+  "outputs" : ["echo-response", "unreachable-response","fallback-stream"],
   "checkpointMode" : "every-nth",
-  "checkpointInterval" : 1000,
-  "parallelism" : 1,
-  "perTaskCores" : 0.1,
-  "perTaskRam" : 64,
-  "options" : {"11" : "3e2ew"},
-  "jvmOptions" : {"11" : "3e2ew"},
+  "checkpointInterval" : 10,
+  "options" : {"line-separator":"\n","policy":"first-match-win","rules":[{"regex":"^(?<ip>[\\d|\\.]+).*\\s(?<latency>[\\d|\\.]+)\\sms.*\\s(?<timestamp>\\d+)","fields":[{"name":"ip","default-value":"0.0.0.0","type":"scalar"},{"name":"latency","default-value":"0","type":"scalar"},{"name":"timestamp","default-value":"0","type":"scalar"}],"output-stream":"echo-response","unique-key":["ip","timestamp"],"distribution":["ip"]},{"regex":"^ICMP.*\\s(?<ip>[\\d|\\.]+).*\\s(?<timestamp>\\d+)$","fields":[{"name":"ip","default-value":"0.0.0.0","type":"scalar"},{"name":"timestamp","default-value":"0","type":"scalar"}],"output-stream":"unreachable-response","unique-key":["ip","timestamp"],"distribution":["ip"]}],"encoding":"UTF-8","fallback-stream":"fallback-stream"},
   "coordinationService" : "zookeeper-ps-service",
-  "performanceReportingInterval" : 10000,
   "lookupHistory" : 100,
-  "queueMaxSize":100,
-  "defaultEvictionPolicy":"LRU",
-  "evictionPolicy":"expanded-time"
+  "queueMaxSize":500,
+  "status":"started"
 }

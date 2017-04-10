@@ -1,0 +1,14 @@
+{
+  "name": "fallback-response",
+  "description": "Tstream for demo",
+  "service": "tstream-ps-service",
+  "tags": [
+    "ping",
+    "station"
+  ],
+  "partitions": 1,
+  "generator": {
+    "generatorType": "local"
+  },
+  "type": "stream.t-stream"
+}

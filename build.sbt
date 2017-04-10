@@ -32,10 +32,10 @@ val commonSettings = Seq(
   parallelExecution in Test := false
 )
 
-lazy val root = (project in file(".")) aggregate(psEchoProcess, psOutput)
+lazy val root = (project in file(".")) aggregate(psProcess, psOutput)
 
-lazy val psEchoProcess = Project(id = "ps-echo-process",
-  base = file("ps-echo-process"))
+lazy val psProcess = Project(id = "ps-process",
+  base = file("ps-process"))
   .settings(commonSettings: _*)
 
 lazy val psOutput = Project(id = "ps-output",

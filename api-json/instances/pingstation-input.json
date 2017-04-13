@@ -2,11 +2,12 @@
   "name" : "pingstation-input",
   "description" : "Input engine settings for ping station example",
   "outputs" : ["echo-response", "unreachable-response","fallback-response"],
+  "perTaskRam":256,
+  "jvmOptions":{"-Xmx": "32m", "-XX:MaxDirectMemorySize=": "4m", "-XX:MaxMetaspaceSize=": "96m" },
   "checkpointMode" : "every-nth",
   "checkpointInterval" : 10,
   "options" : {"line-separator":"\n","policy":"first-match-win","rules":[{"regex":"^(?<ip>[\\d|\\.]+).*\\s(?<latency>[\\d|\\.]+)\\sms.*\\s(?<timestamp>\\d+)","fields":[{"name":"ip","default-value":"0.0.0.0","type":"scalar"},{"name":"latency","default-value":"0","type":"scalar"},{"name":"timestamp","default-value":"0","type":"scalar"}],"output-stream":"echo-response","unique-key":["ip","timestamp"],"distribution":["ip"]},{"regex":"^ICMP.*\\s(?<ip>[\\d|\\.]+).*\\s(?<timestamp>\\d+)$","fields":[{"name":"ip","default-value":"0.0.0.0","type":"scalar"},{"name":"timestamp","default-value":"0","type":"scalar"}],"output-stream":"unreachable-response","unique-key":["ip","timestamp"],"distribution":["ip"]}],"encoding":"UTF-8","fallback-stream":"fallback-response"},
   "coordinationService" : "zookeeper-ps-service",
   "lookupHistory" : 100,
-  "queueMaxSize":500,
-  "status":"started"
+  "queueMaxSize":500
 }

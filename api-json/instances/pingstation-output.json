@@ -9,8 +9,8 @@
   "options" : {"d":1},
   "startFrom" : "oldest",
   "perTaskCores" : 0.1,
-  "perTaskRam" : 64,
-  "jvmOptions" : {"d":1},
+  "perTaskRam":256,
+  "jvmOptions":{"-Xmx": "32m", "-XX:MaxDirectMemorySize=": "4m", "-XX:MaxMetaspaceSize=": "96m" },
   "coordinationService" : "zookeeper-ps-service",
   "performanceReportingInterval" : 10000
 }

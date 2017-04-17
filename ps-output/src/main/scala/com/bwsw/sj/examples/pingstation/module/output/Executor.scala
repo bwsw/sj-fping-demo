@@ -3,7 +3,7 @@ package com.bwsw.sj.examples.pingstation.module.output
 import java.util.Date
 
 import com.bwsw.common.JsonSerializer
-import com.bwsw.sj.engine.core.entities.{OutputEnvelope, TStreamEnvelope}
+import com.bwsw.sj.engine.core.entities.TStreamEnvelope
 import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.OutputStreamingExecutor
 import com.bwsw.sj.engine.core.output.types.es._
@@ -18,7 +18,7 @@ class Executor(manager: OutputEnvironmentManager) extends OutputStreamingExecuto
     * @param envelope Input T-Stream envelope
     * @return List of output envelopes
     */
-  override def onMessage(envelope: TStreamEnvelope[String]): List[OutputEnvelope] = {
+  override def onMessage(envelope: TStreamEnvelope[String]) = {
     val list = envelope.data.map { s =>
       val data = new PingMetrics()
       val rawData = s.split(",")
@@ -30,6 +30,7 @@ class Executor(manager: OutputEnvironmentManager) extends OutputStreamingExecuto
       data.total = data.totalOk + data.totalUnreachable
       data
     }
+
     list
   }
 

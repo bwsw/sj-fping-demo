@@ -7,8 +7,5 @@
     "output"
   ],
   "partitions": 1,
-  "generator": {
-    "generatorType": "local"
-  },
   "type": "stream.t-stream"
 }

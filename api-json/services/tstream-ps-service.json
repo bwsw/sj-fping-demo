@@ -2,10 +2,7 @@
   "name": "tstream-ps-service",
   "description": "Tstream service for demo",
   "type": "TstrQ",
-  "metadataProvider": "cassandra-ps-provider",
-  "metadataNamespace": "pingstation",
-  "dataProvider": "cassandra-ps-provider",
-  "dataNamespace": "pingstation",
-  "lockProvider": "zookeeper-ps-provider",
-  "lockNamespace": "unit"
+  "provider": "zookeeper-ps-provider",
+  "prefix": "/pingstation",
+  "token" : "pingstation"
 }

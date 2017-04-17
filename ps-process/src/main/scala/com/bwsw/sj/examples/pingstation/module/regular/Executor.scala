@@ -15,7 +15,16 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
   private val logger = LoggerFactory.getLogger(this.getClass)
   private val state = manager.getState
 
+  override def onInit(): Unit = { super.onInit(); println("OnInit") }
+
+  override def onTimer(jitter: Long): Unit = { super.onTimer(jitter); println("OnTimer") }
+
+  override def onIdle(): Unit = { super.onIdle(); println("OnIdle") }
+
   override def onMessage(envelope: TStreamEnvelope[Record]): Unit = {
+    logger.debug("Received envelope with following consumer: " + envelope.consumerName)
+    println("OnMessage: " + envelope.consumerName)
+
     val maybePingResponse = envelope.stream match {
         case "echo-response" =>
           val data = envelope.data.head
@@ -34,13 +43,15 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
 
         case stream =>
           logger.debug("Received envelope has incorrect stream field: " + stream)
-          Failure(Exception)
+          Failure(throw new Exception)
     }
 
     val pingResponse = maybePingResponse match {
       case Success(pr) => pr
       case Failure(_) => return
     }
+
+    logger.debug("Parsed envelope to valid PingResponse: " + pingResponse)
 
     if(state.isExist(pingResponse.ip)) {
       val pingEchoState = state.get(pingResponse.ip).asInstanceOf[PingState]
@@ -51,6 +62,8 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
   }
 
   override def onBeforeCheckpoint(): Unit = {
+    logger.debug("Before checkpoint: send accumulated data to output stream")
+
     val outputName = manager.getStreamsByTags(Array("echo", "output")).head
     val output = manager.getRoundRobinOutput(outputName)
 

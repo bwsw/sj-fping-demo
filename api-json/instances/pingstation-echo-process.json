@@ -1,7 +1,7 @@
 {
-  "name" : "pingstation-process",
+  "name" : "pingstation-echo-process",
   "description" : "Regular module for ping station example",
-  "inputs" : ["unreachable-response/split", "echo-response/split"],
+  "inputs" : [ "echo-response"],
   "outputs" : ["echo-response-1m"],
   "checkpointMode" : "time-interval",
   "checkpointInterval" : 60000,
@@ -15,5 +15,14 @@
   "jvmOptions":{"-Xmx": "32m", "-XX:MaxDirectMemorySize=": "4m", "-XX:MaxMetaspaceSize=": "96m" },
   "eventWaitTime" : 10,
   "coordinationService" : "zookeeper-ps-service",
-  "performanceReportingInterval" : 10000
+  "performanceReportingInterval" : 10000,
+  "inputAvroSchema": {
+    "type": "record",
+    "name": "echo",
+    "fields": [
+      {"name": "ip", "type": "string"},
+      {"name": "latency", "type": "string"},
+      {"name": "timestamp", "type": "string"}
+    ]
+  }
 }

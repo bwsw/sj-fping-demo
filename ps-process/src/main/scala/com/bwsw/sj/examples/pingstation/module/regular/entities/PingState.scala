@@ -17,11 +17,11 @@ case class PingState(lastTimeStamp: Long = 0, totalTime: Double = 0, totalSucces
   }
 
   def getSummary(ip: String): String = {
-    lastTimeStamp + ',' + ip + ',' +
+    lastTimeStamp.toString + ',' + ip + ',' +
     {
       if(totalSuccessful > 0) totalTime / totalSuccessful
       else 0
-    } +
+    } + ',' +
     totalSuccessful + ',' + totalUnreachable
   }
 }

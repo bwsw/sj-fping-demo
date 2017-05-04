@@ -119,7 +119,7 @@ sudo apt-get install fping
 ```
 ). And now you can start a flow:
 ```bash
-fping -l -g 91.221.60.0/23 2>&1 | awk '{ print $0, systime(); }' | nc 176.120.25.19 31000
+fping -l -g 91.221.60.0/23 2>&1 | awk '{printf "%s ", $0; system("echo $(date +%s%N | head -c -7)")}' | nc 176.120.25.19 31000
 ```
 
 ### Customization

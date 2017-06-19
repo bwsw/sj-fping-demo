@@ -10,21 +10,33 @@ import com.bwsw.sj.engine.core.entities.OutputEnvelope
   * @author Kseniya Mikhaleva
   */
 class PingMetrics extends OutputEnvelope {
+
+  import PingMetrics._
+
   var ts: Date = null
   var ip: String = null
-  var avgTime: Double= 0
-  var totalOk: Long= 0
-  var totalUnreachable: Long= 0
+  var avgTime: Double = 0
+  var totalOk: Long = 0
+  var totalUnreachable: Long = 0
   var total: Long = 0
 
   override def getFieldsValue = {
     Map(
-      "ts" -> ts,
-      "ip" -> ip,
-      "avg-time" -> avgTime,
-      "total-ok" -> totalOk,
-      "total-unreachable" -> totalUnreachable,
-      "total" -> total
+      tsField -> ts,
+      ipField -> ip,
+      avgTimeField -> avgTime,
+      totalOkField -> totalOk,
+      totalUnreachableField -> totalUnreachable,
+      totalField -> total
     )
   }
+}
+
+object PingMetrics {
+  val tsField = "ts"
+  val ipField = "ip"
+  val avgTimeField = "avg-time"
+  val totalOkField = "total-ok"
+  val totalUnreachableField = "total-unreachable"
+  val totalField = "total"
 }

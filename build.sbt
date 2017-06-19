@@ -10,17 +10,19 @@ val commonSettings = Seq(
     "-deprecation",
     "-feature"
   ),
-//  resolvers += "Sonatype OSS" at "https://oss.sonatype.org/service/local/staging/deploy/maven2",
+  //  resolvers += "Sonatype OSS" at "https://oss.sonatype.org/service/local/staging/deploy/maven2",
 
   resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
-  libraryDependencies ++= Seq("com.bwsw" %% "sj-engine-core" % "1.0-SNAPSHOT" % "provided"),
+  libraryDependencies ++= Seq(
+    "com.bwsw" %% "sj-engine-core" % "1.0-SNAPSHOT" % "provided",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test"),
 
   assemblyMergeStrategy in assembly := {
     case PathList("org", "apache", "commons", "logging", xs@_*) => MergeStrategy.first
     case x if x.endsWith("io.netty.versions.properties") => MergeStrategy.concat
     case "log4j.properties" => MergeStrategy.concat
-    case PathList("io", "netty", xs @_*) => MergeStrategy.first
+    case PathList("io", "netty", xs@_*) => MergeStrategy.first
     case x =>
       val oldStrategy = (assemblyMergeStrategy in assembly).value
       oldStrategy(x)

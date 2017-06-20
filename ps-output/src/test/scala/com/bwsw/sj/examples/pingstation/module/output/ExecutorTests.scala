@@ -3,6 +3,7 @@ package com.bwsw.sj.examples.pingstation.module.output
 import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.simulation.{EsRequestBuilder, OutputEngineSimulator}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics._
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -14,12 +15,13 @@ import scala.util.parsing.json.JSON
 class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
 
   val transactionField = "txn"
+  val manager: OutputEnvironmentManager = mock[OutputEnvironmentManager]
+  when(manager.isCheckpointInitiated).thenReturn(false)
 
   "Executor" should "work properly" in {
-    val manager = mock[OutputEnvironmentManager]
     val executor = new Executor(manager)
     val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
-    val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager, false)
+    val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
 
     val transactionBeforeCheckpoint = Seq(
       Seq(
@@ -99,10 +101,10 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
 
   it should "throw exception if incoming data is incorrect" in {
     val incorrectData = "incorrect data"
-    val manager = mock[OutputEnvironmentManager]
+
     val executor = new Executor(manager)
     val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
-    val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager, false)
+    val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
     engineSimulator.prepare(Seq(incorrectData))
 
     intercept[Exception] {

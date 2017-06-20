@@ -7,6 +7,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util.Try
 import scala.util.parsing.json.JSON
 
 /**
@@ -14,41 +15,44 @@ import scala.util.parsing.json.JSON
   */
 class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
 
+  JSON.globalNumberParser = { value: String =>
+    Try(value.toLong).getOrElse(value.toDouble)
+  }
+
   val transactionField = "txn"
   val manager: OutputEnvironmentManager = mock[OutputEnvironmentManager]
   when(manager.isCheckpointInitiated).thenReturn(false)
+  val executor = new Executor(manager)
+  val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
 
-  "Executor" should "work properly" in {
-    val executor = new Executor(manager)
-    val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
+  "Executor" should "work properly before first checkpoint" in {
     val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
 
-    val transactionBeforeCheckpoint = Seq(
+    val transactions = Seq(
       Seq(
         Data(1497843000, "11.11.11.11", 0.5, 5, 15, 20),
         Data(1497843100, "22.22.22.22", 0.6, 6, 16, 22)),
       Seq(
         Data(1497843200, "33.33.33.33", 0.7, 7, 17, 24)))
 
-    transactionBeforeCheckpoint.foreach { transaction =>
+    transactions.foreach { transaction =>
       engineSimulator.prepare(transaction.map(_.toString))
     }
-    val requestsBeforeCheckpoint = engineSimulator.process()
+    val queries = engineSimulator.process()
 
-    val parsedRequestsBeforeCheckpoint = requestsBeforeCheckpoint.map { request =>
+    val parsedQueries = queries.map { request =>
       JSON.parseFull(request).get.asInstanceOf[Map[String, Any]]
     }
 
     var transactionId: Long = -1
-    val expectedRequestBeforeCheckpoint = transactionBeforeCheckpoint.flatMap { transaction =>
+    val exceptedQueriesData = transactions.flatMap { transaction =>
       transactionId += 1
       transaction.foreach(_.transaction = transactionId)
       transactionId +: transaction
     }
+    exceptedQueriesData.length shouldBe parsedQueries.length
 
-    expectedRequestBeforeCheckpoint.length shouldBe parsedRequestsBeforeCheckpoint.length
-
-    expectedRequestBeforeCheckpoint.zip(parsedRequestsBeforeCheckpoint).foreach {
+    exceptedQueriesData.zip(parsedQueries).foreach {
       case (transaction: Long, request: Map[String, Any]) =>
         val matchField = request("match")
         matchField shouldBe a[Map[_, _]]
@@ -65,35 +69,36 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
       case _ =>
         throw new IllegalStateException
     }
+  }
 
-
+  it should "work properly after first checkpoint" in {
+    val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
     // "perform" first checkpoint
     engineSimulator.wasFirstCheckpoint = true
 
-
-    val transactionAfterCheckpoint = Seq(
+    val transactions = Seq(
       Seq(
         Data(1497843300, "44.44.44.44", 0.8, 8, 18, 26)),
       Seq(
         Data(1497843400, "55.55.55.55", 0.9, 9, 19, 28),
         Data(1497843500, "66.66.66.66", 1.0, 10, 20, 30)))
 
-    transactionId = transactionBeforeCheckpoint.length
-    transactionAfterCheckpoint.foreach { transaction =>
+    var transactionId: Long = -1
+    transactions.foreach { transaction =>
       engineSimulator.prepare(transaction.map(_.toString))
-      transaction.foreach(_.transaction = transactionId)
       transactionId += 1
+      transaction.foreach(_.transaction = transactionId)
     }
 
-    val expectedRequestAfterCheckpoint = transactionAfterCheckpoint.flatten
-    val requestsAfterCheckpoint = engineSimulator.process()
-    val parsedRequestsAfterCheckpoint = requestsAfterCheckpoint.map { request =>
+    val expectedQueriesData = transactions.flatten
+    val queries = engineSimulator.process()
+    val parsedQueries = queries.map { request =>
       JSON.parseFull(request).get.asInstanceOf[Map[String, Any]]
     }
 
-    expectedRequestAfterCheckpoint.length shouldBe parsedRequestsAfterCheckpoint.length
+    expectedQueriesData.length shouldBe parsedQueries.length
 
-    expectedRequestAfterCheckpoint.zip(parsedRequestsAfterCheckpoint).foreach {
+    expectedQueriesData.zip(parsedQueries).foreach {
       case (entity: Data, request: Map[String, Any]) =>
         entity.toMap shouldBe request
     }

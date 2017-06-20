@@ -35,20 +35,14 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
       Seq(
         Data(1497843200, "33.33.33.33", 0.7, 7, 17, 24)))
 
-    transactions.foreach { transaction =>
-      engineSimulator.prepare(transaction.map(_.toString))
+    val exceptedQueriesData = transactions.flatMap { transaction =>
+      val transactionId = engineSimulator.prepare(transaction.map(_.toString))
+      transactionId +: transaction.map(data => (transactionId, data))
     }
-    val queries = engineSimulator.process()
 
+    val queries = engineSimulator.process()
     val parsedQueries = queries.map { request =>
       JSON.parseFull(request).get.asInstanceOf[Map[String, Any]]
-    }
-
-    var transactionId: Long = -1
-    val exceptedQueriesData = transactions.flatMap { transaction =>
-      transactionId += 1
-      transaction.foreach(_.transaction = transactionId)
-      transactionId +: transaction
     }
     exceptedQueriesData.length shouldBe parsedQueries.length
 
@@ -63,8 +57,8 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
         val value = txnField.asInstanceOf[Map[String, Any]]("query")
         value shouldBe transaction
 
-      case (entity: Data, request: Map[String, Any]) =>
-        entity.toMap shouldBe request
+      case ((transactionId: Long, entity: Data), request: Map[String, Any]) =>
+        entity.toMap(transactionId) shouldBe request
 
       case _ =>
         throw new IllegalStateException
@@ -83,32 +77,26 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
         Data(1497843400, "55.55.55.55", 0.9, 9, 19, 28),
         Data(1497843500, "66.66.66.66", 1.0, 10, 20, 30)))
 
-    var transactionId: Long = -1
-    transactions.foreach { transaction =>
-      engineSimulator.prepare(transaction.map(_.toString))
-      transactionId += 1
-      transaction.foreach(_.transaction = transactionId)
+    val exceptedQueriesData = transactions.flatMap { transaction =>
+      val transactionId = engineSimulator.prepare(transaction.map(_.toString))
+      transaction.map(data => (transactionId, data))
     }
 
-    val expectedQueriesData = transactions.flatten
     val queries = engineSimulator.process()
     val parsedQueries = queries.map { request =>
       JSON.parseFull(request).get.asInstanceOf[Map[String, Any]]
     }
+    exceptedQueriesData.length shouldBe parsedQueries.length
 
-    expectedQueriesData.length shouldBe parsedQueries.length
-
-    expectedQueriesData.zip(parsedQueries).foreach {
-      case (entity: Data, request: Map[String, Any]) =>
-        entity.toMap shouldBe request
+    exceptedQueriesData.zip(parsedQueries).foreach {
+      case ((transactionId, entity), request) =>
+        entity.toMap(transactionId) shouldBe request
     }
   }
 
   it should "throw exception if incoming data is incorrect" in {
     val incorrectData = "incorrect data"
 
-    val executor = new Executor(manager)
-    val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
     val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
     engineSimulator.prepare(Seq(incorrectData))
 
@@ -122,13 +110,12 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
                   avgTime: Double,
                   totalOk: Long,
                   totalUnreachable: Long,
-                  total: Long,
-                  var transaction: Long = 0) {
+                  total: Long) {
 
     override def toString: String =
       s"$ts,$ip,$avgTime,$totalOk,$totalUnreachable"
 
-    def toMap = Map(
+    def toMap(transaction: Long): Map[String, Any] = Map(
       transactionField -> transaction,
       tsField -> ts,
       ipField -> ip,

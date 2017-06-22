@@ -1,8 +1,8 @@
 package com.bwsw.sj.examples.pingstation.module.output
 
-import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
+import com.bwsw.sj.common.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.types.es.ElasticsearchCommandBuilder
-import com.bwsw.sj.engine.core.simulation.{EsRequestBuilder, OutputEngineSimulator}
+import com.bwsw.sj.engine.core.simulation.output.{EsRequestBuilder, OutputEngineSimulator}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -50,7 +50,7 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
   it should "work properly after first checkpoint" in {
     val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
     // "perform" first checkpoint
-    engineSimulator.wasFirstCheckpoint = true
+    engineSimulator.beforeFirstCheckpoint = false
 
     val transactions = Seq(
       Seq(
@@ -67,6 +67,9 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
     }
 
     val queries = engineSimulator.process()
+
+    println("Expected: ", expectedQueries)
+    println("Real: ", queries)
 
     queries shouldBe expectedQueries
   }

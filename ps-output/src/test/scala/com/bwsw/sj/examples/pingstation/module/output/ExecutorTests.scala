@@ -1,10 +1,11 @@
 package com.bwsw.sj.examples.pingstation.module.output
 
+import com.bwsw.sj.common.dal.model.service.TStreamServiceDomain
+import com.bwsw.sj.common.dal.model.stream.TStreamStreamDomain
 import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.types.es.ElasticsearchCommandBuilder
 import com.bwsw.sj.engine.core.simulation.{EsRequestBuilder, OutputEngineSimulator}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics._
-import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -16,8 +17,9 @@ import org.scalatest.{FlatSpec, Matchers}
 class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
 
   val transactionField = "txn"
-  val manager: OutputEnvironmentManager = mock[OutputEnvironmentManager]
-  when(manager.isCheckpointInitiated).thenReturn(false)
+  val options = "{}"
+  val outputStream = new TStreamStreamDomain("output-stream", mock[TStreamServiceDomain], 1)
+  val manager: OutputEnvironmentManager = new OutputEnvironmentManager(options, Array(outputStream))
   val executor = new Executor(manager)
   val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
   val commandBuilder = new ElasticsearchCommandBuilder(transactionField, executor.getOutputEntity)
@@ -34,12 +36,12 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
 
     val expectedQueries = transactions.flatMap { transaction =>
       val transactionId = engineSimulator.prepare(transaction.map(_.toString))
-      val deletionQuery = commandBuilder.buildDelete(transactionId)
-      val insertionQueries = transaction.map { data =>
+      val deleteQuery = commandBuilder.buildDelete(transactionId)
+      val insertQueries = transaction.map { data =>
         commandBuilder.buildInsert(transactionId, data.toMap)
       }
 
-      deletionQuery +: insertionQueries
+      deleteQuery +: insertQueries
     }
 
     val queries = engineSimulator.process()
@@ -92,13 +94,15 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
     override def toString: String =
       s"$ts,$ip,$avgTime,$totalOk,$totalUnreachable"
 
-    def toMap: Map[String, Any] = Map(
-      tsField -> ts,
-      ipField -> ip,
-      avgTimeField -> avgTime,
-      totalOkField -> totalOk,
-      totalUnreachableField -> totalUnreachable,
-      totalField -> total)
+    def toMap: Map[String, Any] = {
+      Map(
+        tsField -> ts,
+        ipField -> ip,
+        avgTimeField -> avgTime,
+        totalOkField -> totalOk,
+        totalUnreachableField -> totalUnreachable,
+        totalField -> total)
+    }
   }
 
 }

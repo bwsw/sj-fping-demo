@@ -4,7 +4,7 @@ import com.bwsw.sj.common.dal.model.service.TStreamServiceDomain
 import com.bwsw.sj.common.dal.model.stream.TStreamStreamDomain
 import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.types.es.ElasticsearchCommandBuilder
-import com.bwsw.sj.engine.core.simulation.{EsRequestBuilder, OutputEngineSimulator}
+import com.bwsw.sj.engine.core.simulation.output.{EsRequestBuilder, OutputEngineSimulator}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FlatSpec, Matchers}
@@ -52,7 +52,7 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
   it should "work properly after first checkpoint" in {
     val engineSimulator = new OutputEngineSimulator(executor, requestBuilder, manager)
     // "perform" first checkpoint
-    engineSimulator.wasFirstCheckpoint = true
+    engineSimulator.beforeFirstCheckpoint = false
 
     val transactions = Seq(
       Seq(

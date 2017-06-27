@@ -2,10 +2,10 @@ package com.bwsw.sj.examples.pingstation.module.output
 
 import java.util.Date
 
-import com.bwsw.sj.engine.core.entities.TStreamEnvelope
-import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
+import com.bwsw.sj.common.engine.core.entities.TStreamEnvelope
+import com.bwsw.sj.common.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.types.es._
-import com.bwsw.sj.engine.core.output.{Entity, OutputStreamingExecutor}
+import com.bwsw.sj.common.engine.core.output.{Entity, OutputStreamingExecutor}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics._
 

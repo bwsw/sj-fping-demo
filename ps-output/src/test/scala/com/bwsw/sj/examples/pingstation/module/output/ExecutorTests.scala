@@ -2,7 +2,7 @@ package com.bwsw.sj.examples.pingstation.module.output
 
 import com.bwsw.sj.common.dal.model.service.TStreamServiceDomain
 import com.bwsw.sj.common.dal.model.stream.TStreamStreamDomain
-import com.bwsw.sj.engine.core.environment.OutputEnvironmentManager
+import com.bwsw.sj.common.engine.core.environment.OutputEnvironmentManager
 import com.bwsw.sj.engine.core.output.types.es.ElasticsearchCommandBuilder
 import com.bwsw.sj.engine.core.simulation.output.{EsRequestBuilder, OutputEngineSimulator}
 import com.bwsw.sj.examples.pingstation.module.output.data.PingMetrics._

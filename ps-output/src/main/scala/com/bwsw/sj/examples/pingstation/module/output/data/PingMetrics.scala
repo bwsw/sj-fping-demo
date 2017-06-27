@@ -2,7 +2,7 @@ package com.bwsw.sj.examples.pingstation.module.output.data
 
 import java.util.Date
 
-import com.bwsw.sj.engine.core.entities.OutputEnvelope
+import com.bwsw.sj.common.engine.core.entities.OutputEnvelope
 
 /**
   * Created: 23/06/2016

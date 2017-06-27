@@ -1,8 +1,8 @@
 package com.bwsw.sj.examples.pingstation.module.regular
 
-import com.bwsw.sj.engine.core.entities.TStreamEnvelope
-import com.bwsw.sj.engine.core.environment.ModuleEnvironmentManager
-import com.bwsw.sj.engine.core.regular.RegularStreamingExecutor
+import com.bwsw.sj.common.engine.core.entities.TStreamEnvelope
+import com.bwsw.sj.common.engine.core.environment.ModuleEnvironmentManager
+import com.bwsw.sj.common.engine.core.regular.RegularStreamingExecutor
 import com.bwsw.sj.examples.pingstation.module.regular.entities._
 import org.apache.avro.generic.GenericData.Record
 import org.apache.avro.util.Utf8

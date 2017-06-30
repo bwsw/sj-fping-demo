@@ -14,7 +14,7 @@
       "name": "unreachable",
       "fields": [
         {"name": "ip", "type": "string"},
-        {"name": "timestamp", "type": "string"}
+        {"name": "timestamp", "type": "double"}
       ]
     }
   },

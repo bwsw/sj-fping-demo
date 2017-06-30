@@ -49,15 +49,15 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
       case "echo-response" =>
         val data = envelope.data.head
         Try {
-          EchoResponse(data.get(FieldNames.timestamp).asInstanceOf[Utf8].toString.toLong,
+          EchoResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
             data.get(FieldNames.ip).asInstanceOf[Utf8].toString,
-            data.get(FieldNames.latency).asInstanceOf[Utf8].toString.toDouble)
+            data.get(FieldNames.latency).asInstanceOf[Double])
         }
 
       case "unreachable-response" =>
         val data = envelope.data.head
         Try {
-          UnreachableResponse(data.get(FieldNames.timestamp).asInstanceOf[Utf8].toString.toLong,
+          UnreachableResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
             data.get(FieldNames.ip).asInstanceOf[Utf8].toString)
         }
 

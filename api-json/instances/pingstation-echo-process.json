@@ -14,8 +14,8 @@
       "name": "echo",
       "fields": [
         {"name": "ip", "type": "string"},
-        {"name": "latency", "type": "string"},
-        {"name": "timestamp", "type": "string"}
+        {"name": "latency", "type": "double"},
+        {"name": "timestamp", "type": "long"}
       ]
     }
   },

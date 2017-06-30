@@ -26,14 +26,28 @@ Also you can launch more than one ps-process modules and ps-output modules, resp
 
 ## Installation
 
-You should follow these steps to build and upload the all of modules of ping station demo:
+To configure environment
+
+```bash
+address=<host>:<port>
+```
+
+- *\<host\>:\<port\>* &mdash; SJ Rest host and port.
+
+To upload regex-input module
+
+```bash
+curl "https://oss.sonatype.org/content/repositories/snapshots/com/bwsw/sj-regex-input_2.12/1.0-SNAPSHOT/sj-regex-input_2.12-1.0-SNAPSHOT.jar" -o sj-regex-input.jar
+curl --form jar=@sj-regex-input.jar http://$address/v1/modules
+```
+
+To build and upload all modules of ping station demo
 
 ```bash
 $ git clone https://github.com/bwsw/sj-fping-demo.git
 $ cd sj-fping-demo
 $ sbt assembly
 $ address=<host>:<port>
-$ curl --form jar=@ps-input/target/scala-2.11/ps-input-1.0.jar http://$address/v1/modules
 $ curl --form jar=@ps-process/target/scala-2.11/ps-process-1.0.jar http://$address/v1/modules
 $ curl --form jar=@ps-output/target/scala-2.11/ps-output-1.0.jar http://$address/v1/modules
 ```
@@ -64,7 +78,7 @@ Then you should create an instance for each module:
 
 - For creating an instance of input module send the following post request:
 ```bash
-$ curl --request POST "http://$address/v1/modules/input-streaming/pingstation-input/1.0/instance" -H 'Content-Type: application/json' --data "@api-json/instances/pingstation-input.json"
+$ curl --request POST "http://$address/v1/modules/input-streaming/com.bwsw.input.regex/1.0/instance" -H 'Content-Type: application/json' --data "@api-json/instances/pingstation-input.json"
 ```
 - For creating an instance of process module send the following post request:
 ```bash
@@ -86,7 +100,7 @@ After that you can launch the every module:
 
 - For launching the input module send:
 ```bash
-$ curl --request GET "http://$address/v1/modules/input-streaming/pingstation-input/1.0/instance/pingstation-input/start"
+$ curl --request GET "http://$address/v1/modules/input-streaming/com.bwsw.input.regex/1.0/instance/pingstation-input/start"
 ```
 - For launching the process module send:
 ```bash
@@ -99,7 +113,7 @@ $ curl --request GET "http://$address/v1/modules/output-streaming/pingstation-ou
 
 To get a list of listening ports of input module:
 ```bash
-$ curl --request GET "http://$address/v1/modules/input-streaming/pingstation-input/1.0/instance/pingstation-input"
+$ curl --request GET "http://$address/v1/modules/input-streaming/com.bwsw.input.regex/1.0/instance/pingstation-input"
 ```
 and look at field named tasks, e.g. it will look like
 > "tasks": {   
@@ -148,7 +162,7 @@ To stop the modules:
 
 - For stopping the input module send:
 ```bash
-$ curl --request GET "http://$address/v1/modules/input-streaming/pingstation-input/1.0/instance/pingstation-input/stop"
+$ curl --request GET "http://$address/v1/modules/input-streaming/com.bwsw.input.regex/1.0/instance/pingstation-input/stop"
 ```
 - For stopping the process module send:
 ```bash

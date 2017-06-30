@@ -24,7 +24,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
   private val schemaJson = jsonSerializer.serialize(mapOptions(schemaField))
   private val parser = new Schema.Parser()
   private val schema = parser.parse(schemaJson)
-  private val avroSerializer = new AvroSerializer(Some(schema))
+  private val avroSerializer = new AvroSerializer
 
   override def onInit(): Unit = {
     super.onInit()
@@ -85,7 +85,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     logger.debug("Before checkpoint: send accumulated data to output stream")
 
     val outputName = manager.getStreamsByTags(Array("echo", "output")).head
-    val output = manager.getRoundRobinOutput(outputName)
+    val output = manager.getRoundRobinOutput(outputName, this)
 
     state.getAll.map(echoState => echoState._1 -> echoState._2.asInstanceOf[PingState])
       .map(unreachableState => unreachableState._2.getSummary(unreachableState._1)).foreach(output.put)
@@ -93,5 +93,5 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     state.clear
   }
 
-  override def deserialize(bytes: Array[Byte]): GenericRecord = avroSerializer.deserialize(bytes)
+  override def deserialize(bytes: Array[Byte]): GenericRecord = avroSerializer.deserialize(bytes, schema)
 }

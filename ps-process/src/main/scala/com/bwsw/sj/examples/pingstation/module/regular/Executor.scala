@@ -85,7 +85,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     logger.debug("Before checkpoint: send accumulated data to output stream")
 
     val outputName = manager.getStreamsByTags(Array("echo", "output")).head
-    val output = manager.getRoundRobinOutput(outputName, this)
+    val output = manager.getRoundRobinOutput(outputName)
 
     state.getAll.map(echoState => echoState._1 -> echoState._2.asInstanceOf[PingState])
       .map(unreachableState => unreachableState._2.getSummary(unreachableState._1)).foreach(output.put)

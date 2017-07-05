@@ -16,17 +16,17 @@
           {
             "name": "ip",
             "defaultValue": "0.0.0.0",
-            "type": "scalar"
+            "type": "string"
           },
           {
             "name": "latency",
             "defaultValue": "0",
-            "type": "scalar"
+            "type": "double"
           },
           {
             "name": "timestamp",
             "defaultValue": "0",
-            "type": "scalar"
+            "type": "long"
           }
         ],
         "outputStream": "echo-response",
@@ -44,12 +44,12 @@
           {
             "name": "ip",
             "defaultValue": "0.0.0.0",
-            "type": "scalar"
+            "type": "string"
           },
           {
             "name": "timestamp",
             "defaultValue": "0",
-            "type": "scalar"
+            "type": "long"
           }
         ],
         "outputStream": "unreachable-response",

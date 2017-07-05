@@ -82,9 +82,9 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     pingResponses.foreach { pingResponse =>
       if (state.isExist(pingResponse.ip)) {
         val pingEchoState = state.get(pingResponse.ip).asInstanceOf[PingState]
-        state.set(pingResponse.ip, pingEchoState += pingResponse)
+        state.set(pingResponse.ip, pingEchoState + pingResponse)
       } else {
-        state.set(pingResponse.ip, PingState() += pingResponse)
+        state.set(pingResponse.ip, PingState() + pingResponse)
       }
     }
   }

@@ -12,7 +12,7 @@ import org.apache.avro.generic.GenericRecord
 import org.apache.avro.util.Utf8
 import org.slf4j.LoggerFactory
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 
 class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecutor[Record](manager) {
@@ -72,10 +72,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
         Failure(throw new Exception)
     }
 
-    val pingResponses = maybePingResponse match {
-      case Success(pr) => pr
-      case Failure(_) => return
-    }
+    val pingResponses = maybePingResponse.get
 
     logger.debug("Parsed envelope to valid PingResponses: " + pingResponses.mkString(", "))
 
@@ -95,8 +92,13 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     val outputName = manager.getStreamsByTags(Array("echo", "output")).head
     val output = manager.getRoundRobinOutput(outputName)
 
-    state.getAll.map(echoState => echoState._1 -> echoState._2.asInstanceOf[PingState])
-      .map(unreachableState => unreachableState._2.getSummary(unreachableState._1)).foreach(output.put)
+    state.getAll.foreach {
+      case (ip, pingState: PingState) =>
+        output.put(pingState.getSummary(ip))
+
+      case _ =>
+        throw new IllegalStateException
+    }
 
     state.clear
   }

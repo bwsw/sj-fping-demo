@@ -22,8 +22,8 @@ import com.bwsw.common.JsonSerializer
 import com.bwsw.sj.common.dal.model.service.TStreamServiceDomain
 import com.bwsw.sj.common.dal.model.stream.TStreamStreamDomain
 import com.bwsw.sj.common.engine.core.state.{RAMStateService, StateSaverInterface, StateStorage}
-import com.bwsw.sj.engine.core.simulation.regular.{RegularEngineSimulator, SimulationResult}
-import com.bwsw.sj.engine.core.simulation.state.{ModuleEnvironmentManagerMock, OutputElement, StateLoaderMock}
+import com.bwsw.sj.engine.core.simulation.regular.RegularEngineSimulator
+import com.bwsw.sj.engine.core.simulation.state._
 import com.bwsw.sj.examples.pingstation.module.regular.OptionsLiterals._
 import com.bwsw.sj.examples.pingstation.module.regular.StreamNames._
 import com.bwsw.sj.examples.pingstation.module.regular.entities.{EchoResponse, PingResponse, PingState, UnreachableResponse}
@@ -87,14 +87,14 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
   "Executor" should "put correct data in state (unreachable response) (without checkpoint)" in
     new SimulatorForUnreachableResponse {
       simulator.prepareTstream(unreachableResponses.map(pingResponseToRecord), unreachableResponseStream)
-      val expectedResult = SimulationResult(Map.empty, createState(unreachableResponses))
+      val expectedResult = SimulationResult(Seq.empty, createState(unreachableResponses))
 
       simulator.process() shouldBe expectedResult
     }
 
   it should "put correct data in state (echo response) (without checkpoint)" in new SimulatorForEchoResponse {
     simulator.prepareTstream(echoResponses.map(pingResponseToRecord), echoResponseStream)
-    val expectedResult = SimulationResult(Map.empty, createState(echoResponses))
+    val expectedResult = SimulationResult(Seq.empty, createState(echoResponses))
 
     simulator.process() shouldBe expectedResult
   }
@@ -103,7 +103,7 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
     new SimulatorForUnreachableResponse {
       simulator.prepareState(createState(unreachableResponses))
       val expectedResult = SimulationResult(
-        Map(outputStream.name -> createOutputElements(unreachableResponses)),
+        Seq(StreamData(outputStream.name, createOutputElements(unreachableResponses))),
         Map.empty)
 
       simulator.beforeCheckpoint(false) shouldBe expectedResult
@@ -112,7 +112,7 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
   it should "move data before checkpoint from state to output stream (echo response)" in new SimulatorForEchoResponse {
     simulator.prepareState(createState(echoResponses))
     val expectedResult = SimulationResult(
-      Map(outputStream.name -> createOutputElements(echoResponses)),
+      Seq(StreamData(outputStream.name, createOutputElements(echoResponses))),
       Map.empty)
 
     simulator.beforeCheckpoint(false) shouldBe expectedResult
@@ -152,7 +152,7 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
       record
   }
 
-  def createState(pingResponses: Seq[PingResponse]) = {
+  def createState(pingResponses: Seq[PingResponse]): Map[String, PingState] = {
     val state = new StateStorage(new RAMStateService(mock[StateSaverInterface], new StateLoaderMock))
 
     pingResponses.foreach { pingResponse =>
@@ -169,17 +169,18 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
     state.getAll.mapValues(_.asInstanceOf[PingState])
   }
 
-  def createOutputElements(pingResponses: Seq[PingResponse]) = {
+  def createOutputElements(pingResponses: Seq[PingResponse]): Array[PartitionData] = {
     var partition = 0
+    val partitionDataArray = (0 until partitions).toArray.map(PartitionData(_))
 
-    createState(pingResponses).map {
+    createState(pingResponses).foreach {
       case (ip, pingState) =>
-        val element = OutputElement(pingState.getSummary(ip), partition)
+        partitionDataArray(partition) += pingState.getSummary(ip)
         partition += 1
         if (partition == partitions) partition = 0
+    }
 
-        element
-    }.toBuffer
+    partitionDataArray
   }
 
 

@@ -1,6 +1,44 @@
-name := "pingstation"
+name := "sj-fping-demo"
+version := "1.0-SNAPSHOT"
 scalaVersion := Dependencies.Versions.scala
 addCommandAlias("rebuild", ";clean; compile; package")
+
+pomExtra :=
+  <scm>
+    <url>git@github.com/bwsw/sj-fping-demo.git</url>
+    <connection>scm:git@github.com/bwsw/sj-fping-demo.git</connection>
+  </scm>
+    <developers>
+      <developer>
+        <id>bitworks</id>
+        <name>Bitworks Software, Ltd.</name>
+        <url>http://bitworks.software/</url>
+      </developer>
+    </developers>
+
+fork in run := true
+fork in Test := true
+licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+homepage := Some(url("https://github.com/bwsw/sj-fping-demo.git"))
+pomIncludeRepository := { _ => false }
+scalacOptions += "-feature"
+scalacOptions += "-deprecation"
+parallelExecution in Test := false
+organization := "com.bwsw"
+publishMavenStyle := true
+pomIncludeRepository := { _ => false }
+
+isSnapshot := true
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishArtifact in Test := false
 
 val commonSettings = Seq(
   version := "1.0",

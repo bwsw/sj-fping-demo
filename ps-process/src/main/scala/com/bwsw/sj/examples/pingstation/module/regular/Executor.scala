@@ -12,10 +12,13 @@ import org.apache.avro.generic.GenericRecord
 import org.apache.avro.util.Utf8
 import org.slf4j.LoggerFactory
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 
 class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecutor[Record](manager) {
+
+  import StreamNames._
+
   private val logger = LoggerFactory.getLogger(this.getClass)
   private val state = manager.getState
 
@@ -45,20 +48,23 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     logger.debug("Received envelope with following consumer: " + envelope.consumerName)
     println("OnMessage: " + envelope.consumerName)
 
+
     val maybePingResponse = envelope.stream match {
-      case "echo-response" =>
-        val data = envelope.data.head
+      case `echoResponseStream` =>
         Try {
-          EchoResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
-            data.get(FieldNames.ip).asInstanceOf[Utf8].toString,
-            data.get(FieldNames.latency).asInstanceOf[Double])
+          envelope.data.dequeueAll(_ => true).map { data =>
+            EchoResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
+              data.get(FieldNames.ip).asInstanceOf[Utf8].toString,
+              data.get(FieldNames.latency).asInstanceOf[Double])
+          }
         }
 
-      case "unreachable-response" =>
-        val data = envelope.data.head
+      case `unreachableResponseStream` =>
         Try {
-          UnreachableResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
-            data.get(FieldNames.ip).asInstanceOf[Utf8].toString)
+          envelope.data.dequeueAll(_ => true).map { data =>
+            UnreachableResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
+              data.get(FieldNames.ip).asInstanceOf[Utf8].toString)
+          }
         }
 
       case stream =>
@@ -66,18 +72,17 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
         Failure(throw new Exception)
     }
 
-    val pingResponse = maybePingResponse match {
-      case Success(pr) => pr
-      case Failure(_) => return
-    }
+    val pingResponses = maybePingResponse.get
 
-    logger.debug("Parsed envelope to valid PingResponse: " + pingResponse)
+    logger.debug("Parsed envelope to valid PingResponses: " + pingResponses.mkString(", "))
 
-    if (state.isExist(pingResponse.ip)) {
-      val pingEchoState = state.get(pingResponse.ip).asInstanceOf[PingState]
-      state.set(pingResponse.ip, pingEchoState += pingResponse)
-    } else {
-      state.set(pingResponse.ip, PingState() += pingResponse)
+    pingResponses.foreach { pingResponse =>
+      if (state.isExist(pingResponse.ip)) {
+        val pingEchoState = state.get(pingResponse.ip).asInstanceOf[PingState]
+        state.set(pingResponse.ip, pingEchoState + pingResponse)
+      } else {
+        state.set(pingResponse.ip, PingState() + pingResponse)
+      }
     }
   }
 
@@ -87,11 +92,21 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
     val outputName = manager.getStreamsByTags(Array("echo", "output")).head
     val output = manager.getRoundRobinOutput(outputName)
 
-    state.getAll.map(echoState => echoState._1 -> echoState._2.asInstanceOf[PingState])
-      .map(unreachableState => unreachableState._2.getSummary(unreachableState._1)).foreach(output.put)
+    state.getAll.foreach {
+      case (ip, pingState: PingState) =>
+        output.put(pingState.getSummary(ip))
+
+      case _ =>
+        throw new IllegalStateException
+    }
 
     state.clear
   }
 
   override def deserialize(bytes: Array[Byte]): GenericRecord = avroSerializer.deserialize(bytes, schema)
+}
+
+object StreamNames {
+  val unreachableResponseStream = "unreachable-response"
+  val echoResponseStream = "echo-response"
 }

@@ -1,5 +1,6 @@
 package com.bwsw.sj.examples.pingstation.module.output
 
+import com.bwsw.common.file.utils.FileStorage
 import com.bwsw.sj.common.dal.model.service.TStreamServiceDomain
 import com.bwsw.sj.common.dal.model.stream.TStreamStreamDomain
 import com.bwsw.sj.common.engine.core.environment.OutputEnvironmentManager
@@ -19,7 +20,10 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar {
   val transactionField = "txn"
   val options = "{}"
   val outputStream = new TStreamStreamDomain("output-stream", mock[TStreamServiceDomain], 1)
-  val manager: OutputEnvironmentManager = new OutputEnvironmentManager(options, Array(outputStream))
+  val manager: OutputEnvironmentManager = new OutputEnvironmentManager(
+    options,
+    Array(outputStream),
+    mock[FileStorage])
   val executor = new Executor(manager)
   val requestBuilder = new EsRequestBuilder(executor.getOutputEntity)
   val commandBuilder = new ElasticsearchCommandBuilder(transactionField, executor.getOutputEntity)

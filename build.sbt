@@ -1,9 +1,9 @@
 name := "sj-fping-demo"
-version := "1.0-SNAPSHOT"
+val demoVersion = "1.0-SNAPSHOT"
 
 addCommandAlias("rebuild", ";clean; compile; package")
-
 val commonSettings = Seq(
+  version := demoVersion,
   scalaVersion := Dependencies.Versions.scala,
   scalacOptions ++= Seq(
     "-unchecked",
@@ -72,10 +72,12 @@ val commonSettings = Seq(
 
 lazy val root = (project in file(".")).settings(publish := {}) aggregate(psProcess, psOutput)
 
-lazy val psProcess = Project(id = "ps-process",
+lazy val psProcess = Project(
+  id = "ps-process",
   base = file("ps-process"))
   .settings(commonSettings: _*)
 
-lazy val psOutput = Project(id = "ps-output",
+lazy val psOutput = Project(
+  id = "ps-output",
   base = file("ps-output"))
   .settings(commonSettings: _*)

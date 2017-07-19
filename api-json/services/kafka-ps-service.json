@@ -2,7 +2,7 @@
   "name": "kafka-ps-service",
   "description": "Kafka service for demo",
   "provider": "kafka-ps-provider",
-  "type": "KfkQ",
+  "type": "service.apache-kafka",
   "zkProvider": "zookeeper-ps-provider",
   "zkNamespace": "pingstation"
 }

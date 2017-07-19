@@ -7,5 +7,5 @@
     "output"
   ],
   "partitions": 1,
-  "type": "stream.t-stream"
+  "type": "stream.t-streams"
 }

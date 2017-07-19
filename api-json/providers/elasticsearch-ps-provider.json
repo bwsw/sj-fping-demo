@@ -1,7 +1,7 @@
 {
   "name": "elasticsearch-ps-provider",
   "description": "Elasticsearch provider for demo",
-  "type": "ES",
+  "type": "provider.elasticsearch",
   "hosts": [
     "176.120.25.19:9300"
   ]

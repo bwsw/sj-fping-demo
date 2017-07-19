@@ -3,5 +3,5 @@
   "description": "Zookeeper service for demo",
   "provider": "zookeeper-ps-provider",
   "namespace": "pingstation",
-  "type": "ZKCoord"
+  "type": "service.apache-zookeeper"
 }

@@ -2,7 +2,7 @@
   "name": "zookeeper-ps-provider",
   "description": "Zookeeper provider for demo",
   "login": "test",
-  "type": "zookeeper",
+  "type": "provider.apache-zookeeper",
   "hosts": [
     "176.120.25.19:2181"
   ]

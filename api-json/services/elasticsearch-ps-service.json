@@ -5,5 +5,5 @@
   "login" : "test",
   "password":"test",
   "index": "pingstation",
-  "type": "ESInd"
+  "type": "service.elasticsearch"
 }

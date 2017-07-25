@@ -18,6 +18,8 @@
  */
 package com.bwsw.sj.examples.pingstation.module.regular
 
+import java.util.Date
+
 import com.bwsw.common.JsonSerializer
 import com.bwsw.sj.common.dal.model.service.TStreamServiceDomain
 import com.bwsw.sj.common.dal.model.stream.TStreamStreamDomain
@@ -57,7 +59,8 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
     name = "output",
     service = mock[TStreamServiceDomain],
     partitions = partitions,
-    tags = Array("echo", "output"))
+    tags = Array("echo", "output"),
+    creationDate = new Date())
   val stateService = new RAMStateService(mock[StateSaverInterface], new StateLoaderMock)
   val stateStorage = new StateStorage(stateService)
 

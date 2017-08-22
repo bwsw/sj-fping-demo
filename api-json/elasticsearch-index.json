@@ -6,7 +6,7 @@
     "es-echo-response-1m" : {
       "properties" : {
         "ts" : { "type" : "date" },
-        "ip" : { "type" : "string" },
+        "ip" : { "type" : "ip" },
         "avg-time" : { "type" : "double" },
         "total-ok" : { "type" : "long" },
         "total-unreachable" : { "type" : "long" },

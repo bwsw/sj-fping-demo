@@ -82,7 +82,7 @@ $ curl --request POST "http://$address/v1/modules/input-streaming/com.bwsw.input
 ```
 - For creating an instance of process module send the following post request:
 ```bash
-$ curl --request POST "http://$address/v1/modules/regular-streaming/pingstation-process/1.0/instance" -H 'Content-Type: application/json' --data "pingstation-echo-process.json"
+$ curl --request POST "http://$address/v1/modules/regular-streaming/pingstation-process/1.0/instance" -H 'Content-Type: application/json' --data "@api-json/instances/pingstation-echo-process.json"
 ```
 - For creating an instance of output module send the following post request:
 ```bash

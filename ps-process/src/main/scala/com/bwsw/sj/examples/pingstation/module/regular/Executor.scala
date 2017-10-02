@@ -6,11 +6,11 @@ import com.bwsw.sj.common.engine.core.environment.ModuleEnvironmentManager
 import com.bwsw.sj.common.engine.core.regular.RegularStreamingExecutor
 import com.bwsw.sj.examples.pingstation.module.regular.OptionsLiterals._
 import com.bwsw.sj.examples.pingstation.module.regular.entities._
+import com.typesafe.scalalogging.Logger
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericData.Record
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.util.Utf8
-import org.slf4j.LoggerFactory
 
 import scala.util.{Failure, Try}
 
@@ -19,7 +19,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
 
   import StreamNames._
 
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private val logger = Logger(this.getClass)
   private val state = manager.getState
 
   private val jsonSerializer = new JsonSerializer
@@ -46,13 +46,11 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
 
   override def onMessage(envelope: TStreamEnvelope[Record]): Unit = {
     logger.debug("Received envelope with following consumer: " + envelope.consumerName)
-    println("OnMessage: " + envelope.consumerName)
-
 
     val maybePingResponse = envelope.stream match {
       case `echoResponseStream` =>
         Try {
-          envelope.data.dequeueAll(_ => true).map { data =>
+          envelope.data.toList.map { data =>
             EchoResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
               data.get(FieldNames.ip).asInstanceOf[Utf8].toString,
               data.get(FieldNames.latency).asInstanceOf[Double])
@@ -61,7 +59,7 @@ class Executor(manager: ModuleEnvironmentManager) extends RegularStreamingExecut
 
       case `unreachableResponseStream` =>
         Try {
-          envelope.data.dequeueAll(_ => true).map { data =>
+          envelope.data.toList.map { data =>
             UnreachableResponse(data.get(FieldNames.timestamp).asInstanceOf[Long],
               data.get(FieldNames.ip).asInstanceOf[Utf8].toString)
           }

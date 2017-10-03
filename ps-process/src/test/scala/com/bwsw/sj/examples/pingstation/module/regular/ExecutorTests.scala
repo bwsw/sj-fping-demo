@@ -191,7 +191,8 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
     val manager = new ModuleEnvironmentManagerMock(
       stateStorage,
       createOptions(unreachableResponseSchema),
-      Array(outputStream))
+      Array(outputStream),
+      new TStreamsSenderThreadMock(Set(outputStream.name)))
     val executor = new Executor(manager)
     val simulator = new RegularEngineSimulator(executor, manager)
   }
@@ -200,7 +201,8 @@ class ExecutorTests extends FlatSpec with Matchers with MockitoSugar with Before
     val manager = new ModuleEnvironmentManagerMock(
       stateStorage,
       createOptions(echoResponseSchema),
-      Array(outputStream))
+      Array(outputStream),
+      new TStreamsSenderThreadMock(Set(outputStream.name)))
     val executor = new Executor(manager)
     val simulator = new RegularEngineSimulator(executor, manager)
   }

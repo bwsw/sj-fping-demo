@@ -1,32 +1,42 @@
 {
-  "name" : "pingstation-unreachable-process",
-  "description" : "Regular module for ping station example",
-  "inputs" : ["unreachable-response"],
-  "outputs" : ["echo-response-1m"],
-  "checkpointMode" : "time-interval",
-  "checkpointInterval" : 60000,
-  "stateManagement" : "ram",
-  "stateFullCheckpoint" : 5,
-  "parallelism" : 1,
-  "options" : {
+  "name": "pingstation-unreachable-process",
+  "description": "Regular module for ping station example",
+  "inputs": [
+    "unreachable-response"
+  ],
+  "outputs": [
+    "echo-response-1m"
+  ],
+  "checkpointMode": "time-interval",
+  "checkpointInterval": 60000,
+  "stateManagement": "ram",
+  "stateFullCheckpoint": 5,
+  "parallelism": 1,
+  "options": {
     "schema": {
       "type": "record",
       "name": "unreachable",
       "fields": [
-        {"name": "ip", "type": "string"},
-        {"name": "timestamp", "type": "double"}
+        {
+          "name": "ip",
+          "type": "string"
+        },
+        {
+          "name": "timestamp",
+          "type": "double"
+        }
       ]
     }
   },
-  "startFrom" : "oldest",
-  "perTaskCores" : 0.1,
-  "perTaskRam":256,
+  "startFrom": "oldest",
+  "perTaskCores": 0.1,
+  "perTaskRam": 1024,
   "jvmOptions": {
-    "-Xmx": "32m",
-    "-XX:MaxDirectMemorySize=": "4m",
-    "-XX:MaxMetaspaceSize=": "96m"
+    "-Xmx": "512m",
+    "-XX:MaxDirectMemorySize=": "768m",
+    "-XX:MaxMetaspaceSize=": "256m"
   },
-  "eventWaitTime" : 10,
-  "coordinationService" : "zookeeper-ps-service",
-  "performanceReportingInterval" : 10000
+  "eventWaitTime": 10,
+  "coordinationService": "zookeeper-ps-service",
+  "performanceReportingInterval": 10000
 }

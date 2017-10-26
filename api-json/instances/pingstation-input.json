@@ -1,12 +1,20 @@
 {
-  "name" : "pingstation-input",
-  "description" : "Input engine settings for ping station example",
-  "outputs" : ["echo-response", "unreachable-response","fallback-response"],
-  "perTaskRam":256,
-  "jvmOptions":{"-Xmx": "32m", "-XX:MaxDirectMemorySize=": "4m", "-XX:MaxMetaspaceSize=": "96m" },
-  "checkpointMode" : "every-nth",
-  "checkpointInterval" : 10,
-  "options" : {
+  "name": "pingstation-input",
+  "description": "Input engine settings for ping station example",
+  "outputs": [
+    "echo-response",
+    "unreachable-response",
+    "fallback-response"
+  ],
+  "perTaskRam": 1024,
+  "jvmOptions": {
+    "-Xmx": "512m",
+    "-XX:MaxDirectMemorySize=": "768m",
+    "-XX:MaxMetaspaceSize=": "256m"
+  },
+  "checkpointMode": "every-nth",
+  "checkpointInterval": 10,
+  "options": {
     "lineSeparator": "\n",
     "policy": "first-match-win",
     "rules": [
@@ -65,7 +73,7 @@
     "encoding": "UTF-8",
     "fallbackStream": "fallback-response"
   },
-  "coordinationService" : "zookeeper-ps-service",
-  "lookupHistory" : 100,
-  "queueMaxSize":500
+  "coordinationService": "zookeeper-ps-service",
+  "lookupHistory": 100,
+  "queueMaxSize": 500
 }

@@ -45,9 +45,9 @@ val commonSettings = Seq(
   publishArtifact in Test := false,
 
 
-  //  resolvers += "Sonatype OSS" at "https://oss.sonatype.org/service/local/staging/deploy/maven2",
-
+  resolvers += "Sonatype OSS" at "https://oss.sonatype.org/service/local/staging/deploy/maven2",
   resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  resolvers += "Elasticsearch Releases" at "https://artifacts.elastic.co/maven",
 
   libraryDependencies ++= Seq(
     "com.bwsw" %% "sj-engine-core" % "1.0-SNAPSHOT" % "provided",

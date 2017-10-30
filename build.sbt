@@ -1,7 +1,9 @@
 name := "sj-fping-demo"
+
 val demoVersion = "1.0-SNAPSHOT"
 
 addCommandAlias("rebuild", ";clean; compile; package")
+
 val commonSettings = Seq(
   version := demoVersion,
   scalaVersion := Dependencies.Versions.scala,
@@ -10,8 +12,7 @@ val commonSettings = Seq(
     "-deprecation",
     "-feature"
   ),
-  fork in run := true,
-  fork in Test := true,
+
   licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   homepage := Some(url("https://github.com/bwsw/sj-fping-demo.git")),
   pomIncludeRepository := { _ => false },
@@ -45,15 +46,9 @@ val commonSettings = Seq(
   publishArtifact in Test := false,
 
 
-  resolvers += "Sonatype OSS" at "https://oss.sonatype.org/service/local/staging/deploy/maven2",
   resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-  resolvers += "Elasticsearch Releases" at "https://artifacts.elastic.co/maven",
 
-  libraryDependencies ++= Seq(
-    "com.bwsw" %% "sj-engine-core" % "1.0-SNAPSHOT" % "provided",
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    "com.bwsw" %% "sj-engine-simulators" % "1.0-SNAPSHOT" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test"),
+  libraryDependencies ++= Dependencies.sjFpingDependencies.value,
 
   assemblyMergeStrategy in assembly := {
     case PathList("org", "apache", "commons", "logging", xs@_*) => MergeStrategy.first
